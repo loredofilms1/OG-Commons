@@ -5,8 +5,10 @@ import java.time.Period;
 
 import org.testng.annotations.Test;
 
+import com.opengamma.basics.currency.Currency;
 import com.opengamma.basics.date.BusinessDayCalendar;
 import com.opengamma.basics.date.BusinessDayConvention;
+import com.opengamma.basics.date.DayCount;
 
 @Test
 public class GeneratedScheduleProviderTest {
@@ -41,6 +43,9 @@ public class GeneratedScheduleProviderTest {
         new PaymentDatesGenerator(paymentSchedule);
      Schedule scheduleWithPaymentDates = paymentDatesGenerator.generate(scheduleWithAccrualDates);
 
-    System.out.println(scheduleWithPaymentDates);
+    CouponGenerator couponGenerator = new CouponGenerator(Currency.USD, DayCount.DC_30U_360, 100_000_000, 0.0150, true);
+    Schedule scheduleWithCoupons = couponGenerator.generate(scheduleWithPaymentDates);
+
+    System.out.println(scheduleWithCoupons);
   }
 }
