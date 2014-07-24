@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.joda.beans.Bean;
@@ -47,12 +49,12 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
   private final LocalDate startDate;
 
   @PropertyDefinition(validate = "notNull")
-  private final List<SchedulePeriod> rows;
+  private final List<SchedulePeriod> periods;
 
   @ImmutableConstructor
-  Schedule(LocalDate startDate, List<SchedulePeriod> rows) {
+  Schedule(LocalDate startDate, List<SchedulePeriod> periods) {
     this.startDate = ArgChecker.notNull(startDate, "startDate");
-    this.rows = ArgChecker.notNull(rows, "rows");
+    this.periods = ArgChecker.notNull(periods, "rows");
   }
 
   /**
@@ -72,19 +74,19 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
   }
 
   public SchedulePeriod period(int periodNum) {
-    return rows.get(periodNum);
+    return periods.get(periodNum);
   }
 
   public int periodCount() {
-    return rows.size();
+    return periods.size();
   }
 
   public <T> Schedule withColumn(ScheduleColumn<T> column) {
-    if (column.size() != rows.size()) {
-      throw new IllegalArgumentException("Wrong number of rows in column " + column.size() + ", expected " + rows.size());
+    if (column.size() != periods.size()) {
+      throw new IllegalArgumentException("Wrong number of rows in column " + column.size() + ", expected " + periods.size());
     }
     ImmutableList<SchedulePeriod> updatedRows =
-        zip(rows, column.getValues(), (row, value) -> row.withValues(column.getKey(), value)).collect(toImmutableList());
+        zip(periods, column.getValues(), (row, value) -> row.withValues(column.getKey(), value)).collect(toImmutableList());
     return new Schedule(startDate, updatedRows);
   }
 
@@ -93,9 +95,13 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
 
   }*/
 
+  public Schedule map(Function<SchedulePeriod, SchedulePeriod> function) {
+    return new Schedule(startDate, periods.stream().map(function::apply).collect(Collectors.toList()));
+  }
+
   @Override
   public Iterator<SchedulePeriod> iterator() {
-    return rows.iterator();
+    return periods.iterator();
   }
 
   // TODO this is probably generally useful, move somewhere?
@@ -182,8 +188,8 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
    * Gets the rows.
    * @return the value of the property, not null
    */
-  public List<SchedulePeriod> getRows() {
-    return rows;
+  public List<SchedulePeriod> getPeriods() {
+    return periods;
   }
 
   //-----------------------------------------------------------------------
@@ -203,7 +209,7 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
     if (obj != null && obj.getClass() == this.getClass()) {
       Schedule other = (Schedule) obj;
       return JodaBeanUtils.equal(getStartDate(), other.getStartDate()) &&
-          JodaBeanUtils.equal(getRows(), other.getRows());
+          JodaBeanUtils.equal(getPeriods(), other.getPeriods());
     }
     return false;
   }
@@ -212,7 +218,7 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
   public int hashCode() {
     int hash = getClass().hashCode();
     hash += hash * 31 + JodaBeanUtils.hashCode(getStartDate());
-    hash += hash * 31 + JodaBeanUtils.hashCode(getRows());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getPeriods());
     return hash;
   }
 
@@ -231,7 +237,7 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
 
   protected void toString(StringBuilder buf) {
     buf.append("startDate").append('=').append(JodaBeanUtils.toString(getStartDate())).append(',').append(' ');
-    buf.append("rows").append('=').append(JodaBeanUtils.toString(getRows())).append(',').append(' ');
+    buf.append("rows").append('=').append(JodaBeanUtils.toString(getPeriods())).append(',').append(' ');
   }
 
   //-----------------------------------------------------------------------
@@ -319,7 +325,7 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
         case -2129778896:  // startDate
           return ((Schedule) bean).getStartDate();
         case 3506649:  // rows
-          return ((Schedule) bean).getRows();
+          return ((Schedule) bean).getPeriods();
       }
       return super.propertyGet(bean, propertyName, quiet);
     }
@@ -356,7 +362,7 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
      */
     protected Builder(Schedule beanToCopy) {
       this.startDate = beanToCopy.getStartDate();
-      this.rows = new ArrayList<SchedulePeriod>(beanToCopy.getRows());
+      this.rows = new ArrayList<SchedulePeriod>(beanToCopy.getPeriods());
     }
 
     //-----------------------------------------------------------------------

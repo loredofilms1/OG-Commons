@@ -6,8 +6,6 @@
 package com.opengamma.schedule;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import com.opengamma.basics.date.BusinessDayCalendar;
@@ -31,19 +29,14 @@ public class PaymentDatesGenerator implements ScheduleGenerator {
     BusinessDayConvention businessDayConvention = scheduleDefinition.getBusinessDayConvention();
     BusinessDayCalendar calendar = scheduleDefinition.getCalendar().get();
     int offset = scheduleDefinition.getOffsetDays();
-
     FieldKey<LocalDate> accrualDateKey = (relativeToEnd ? FieldKeys.ACCRUAL_END_DATE : FieldKeys.ACCRUAL_START_DATE);
-    // TODO ScheduleBuilder
-    List<SchedulePeriod> periods = new ArrayList<>();
 
-    for (SchedulePeriod period : schedule) {
+    return schedule.map(period -> {
       Optional<LocalDate> optionalAccrualDate = period.getFieldMap().get(accrualDateKey);
       // TODO what's the best thing to do if a required field is missing? exception?
       LocalDate accrualDate = optionalAccrualDate.get();
-
       LocalDate paymentDate = businessDayConvention.adjust(accrualDate, calendar).with(calendar.adjustBy(offset));
-      periods.add(period.withValues(FieldKeys.PAYMENT_DATE, paymentDate));
-    }
-    return new Schedule(schedule.getStartDate(), periods);
+      return period.withValues(FieldKeys.PAYMENT_DATE, paymentDate);
+    });
   }
 }
