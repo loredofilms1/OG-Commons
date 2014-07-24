@@ -8,11 +8,7 @@ package com.opengamma.schedule;
 /**
  *
  */
-public enum Stub {
+public interface ScheduleProvider {
 
-  SHORT_START,
-  LONG_START,
-  SHORT_END,
-  LONG_END,
-  NONE
+  Schedule getSchedule();
 }
