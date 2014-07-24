@@ -22,17 +22,25 @@ public class GeneratedScheduleProviderTest {
     // TODO real USD calendar
     BusinessDayCalendar calendar = BusinessDayCalendar.WEEKENDS;
     BusinessDayConvention businessDayConvention = BusinessDayConvention.MODIFIED_FOLLOWING;
-
     LocalDate startDate = LocalDate.of(2014, 9, 12);
     LocalDate endDate = LocalDate.of(2021, 9, 12);
-
-    AccrualDatesGenerator accrualDatesGenerator = new AccrualDatesGenerator(calendar, businessDayConvention);
     UnadjustedScheduleDefinition unadjustedSchedule =
         new UnadjustedScheduleDefinition(startDate, endDate, Period.ofMonths(6), false, Stub.NONE);
-    Schedule schedule = Schedule.of(startDate, unadjustedSchedule.calculatePeriods());
-    Schedule scheduleWithAccrual = accrualDatesGenerator.generate(schedule);
-    System.out.println(scheduleWithAccrual);
-    //PaymentDatesGenerator paymentDatesGenerator = new PaymentDatesGenerator();
 
+    AdjustedScheduleDefinition accrualSchedule =
+        new AdjustedScheduleDefinition(() -> calendar, businessDayConvention, 0, false);
+    AccrualDatesGenerator accrualDatesGenerator =
+        new AccrualDatesGenerator(accrualSchedule);
+    Schedule schedule = Schedule.of(startDate, unadjustedSchedule.calculatePeriods());
+    Schedule scheduleWithAccrualDates = accrualDatesGenerator.generate(schedule);
+
+    int paymentOffset = 2;
+    AdjustedScheduleDefinition paymentSchedule =
+        new AdjustedScheduleDefinition(() -> calendar, businessDayConvention, paymentOffset, false);
+    PaymentDatesGenerator paymentDatesGenerator =
+        new PaymentDatesGenerator(paymentSchedule);
+     Schedule scheduleWithPaymentDates = paymentDatesGenerator.generate(scheduleWithAccrualDates);
+
+    System.out.println(scheduleWithPaymentDates);
   }
 }

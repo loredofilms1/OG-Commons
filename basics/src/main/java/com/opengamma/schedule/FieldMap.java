@@ -46,6 +46,7 @@ public class FieldMap implements ImmutableBean {
     this.map = ImmutableMap.copyOf(ArgChecker.notNull(map, "map"));
   }
 
+  // TODO should there be a different get*() method that returns the value and throws an exception if there isn't one?
   @SuppressWarnings("unchecked")
   public <T> Optional<T> get(FieldKey<T> key) {
     ArgChecker.notNull(key, "key");

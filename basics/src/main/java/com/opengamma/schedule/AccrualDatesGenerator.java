@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.opengamma.basics.date.BusinessDayCalendar;
 import com.opengamma.basics.date.BusinessDayConvention;
+import com.opengamma.collect.ArgChecker;
 import com.opengamma.collect.range.LocalDateRange;
 
 /**
@@ -18,12 +19,10 @@ import com.opengamma.collect.range.LocalDateRange;
  */
 public class AccrualDatesGenerator implements ScheduleGenerator {
 
-  private final BusinessDayCalendar calendar;
-  private final BusinessDayConvention businessDayConvention;
+  private final AdjustedScheduleDefinition scheduleDefinition;
 
-  public AccrualDatesGenerator(BusinessDayCalendar calendar, BusinessDayConvention businessDayConvention) {
-    this.calendar = calendar;
-    this.businessDayConvention = businessDayConvention;
+  public AccrualDatesGenerator(AdjustedScheduleDefinition scheduleDefinition) {
+    this.scheduleDefinition = ArgChecker.notNull(scheduleDefinition, "scheduleDefinition");
   }
 
   @Override
@@ -34,6 +33,8 @@ public class AccrualDatesGenerator implements ScheduleGenerator {
 
     // TODO there needs to be a nicer way to build up a modified schedule than this. ScheduleBuilder?
     List<SchedulePeriod> periods = new ArrayList<>();
+    BusinessDayConvention businessDayConvention = scheduleDefinition.getBusinessDayConvention();
+    BusinessDayCalendar calendar = scheduleDefinition.getCalendar().get();
 
     // need to go from the unadjusted schedule of end dates to 2 columns, accrual start and end
     for (SchedulePeriod period : schedule) {
