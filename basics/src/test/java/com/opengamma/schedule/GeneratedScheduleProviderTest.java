@@ -5,6 +5,7 @@ import java.time.Period;
 
 import org.testng.annotations.Test;
 
+import com.google.common.collect.ImmutableList;
 import com.opengamma.basics.currency.Currency;
 import com.opengamma.basics.date.BusinessDayCalendar;
 import com.opengamma.basics.date.BusinessDayConvention;
@@ -26,26 +27,38 @@ public class GeneratedScheduleProviderTest {
     BusinessDayConvention businessDayConvention = BusinessDayConvention.MODIFIED_FOLLOWING;
     LocalDate startDate = LocalDate.of(2014, 9, 12);
     LocalDate endDate = LocalDate.of(2021, 9, 12);
-    UnadjustedScheduleDefinition unadjustedSchedule =
+    UnadjustedScheduleDefinition unadjustedScheduleDefinition =
         new UnadjustedScheduleDefinition(startDate, endDate, Period.ofMonths(6), false, Stub.NONE);
 
-    AdjustedScheduleDefinition accrualSchedule =
+    AdjustedScheduleDefinition accrualScheduleDefinition =
         new AdjustedScheduleDefinition(() -> calendar, businessDayConvention, 0, false);
-    AccrualDatesGenerator accrualDatesGenerator =
-        new AccrualDatesGenerator(accrualSchedule);
-    Schedule schedule = Schedule.of(startDate, unadjustedSchedule.calculatePeriods());
-    Schedule scheduleWithAccrualDates = accrualDatesGenerator.generate(schedule);
 
     int paymentOffset = 2;
     AdjustedScheduleDefinition paymentSchedule =
         new AdjustedScheduleDefinition(() -> calendar, businessDayConvention, paymentOffset, false);
-    PaymentDatesGenerator paymentDatesGenerator =
-        new PaymentDatesGenerator(paymentSchedule);
-     Schedule scheduleWithPaymentDates = paymentDatesGenerator.generate(scheduleWithAccrualDates);
 
-    CouponGenerator couponGenerator = new CouponGenerator(Currency.USD, DayCount.DC_30U_360, 100_000_000, 0.0150, true);
-    Schedule scheduleWithCoupons = couponGenerator.generate(scheduleWithPaymentDates);
+    AccrualDatesGenerator accrualDatesGenerator = new AccrualDatesGenerator();
+    PaymentDatesGenerator paymentDatesGenerator = new PaymentDatesGenerator();
+    CouponGenerator couponGenerator = new CouponGenerator();
 
-    System.out.println(scheduleWithCoupons);
+    // TODO choose the generators based on the schedules and any other data in the model
+
+    ImmutableList<ScheduleGenerator> generators = ImmutableList.of(accrualDatesGenerator,
+                                                                   paymentDatesGenerator,
+                                                                   couponGenerator);
+    FieldMap tradeFields = new FieldMapBuilder().add(Fields.ACCRUAL_SCHEDULE, accrualScheduleDefinition)
+                                                .add(Fields.PAYMENT_SCHEDULE, paymentSchedule)
+                                                .add(Fields.CURRENCY, Currency.USD)
+                                                .add(Fields.NOTIONAL, 100_000_000d)
+                                                .add(Fields.RATE, 0.015)
+                                                .add(Fields.PAYER, true)
+                                                .add(Fields.DAY_COUNT, DayCount.DC_30U_360)
+                                                .build();
+
+    GeneratedScheduleProvider scheduleProvider =
+        new GeneratedScheduleProvider(unadjustedScheduleDefinition, generators, tradeFields);
+
+    Schedule schedule = scheduleProvider.getSchedule();
+    System.out.println(schedule);
   }
 }

@@ -10,7 +10,6 @@ import static com.opengamma.collect.Guavate.toImmutableList;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,6 @@ import org.joda.beans.impl.direct.DirectMetaPropertyMap;
 import com.google.common.collect.ImmutableList;
 import com.opengamma.collect.ArgChecker;
 import com.opengamma.collect.Guavate;
-import com.opengamma.collect.range.LocalDateRange;
 
 /**
  * TODO make the builder private to stop confusion with a separate ScheduleBuilder (if that happens)
@@ -55,22 +53,6 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
   Schedule(LocalDate startDate, List<SchedulePeriod> periods) {
     this.startDate = ArgChecker.notNull(startDate, "startDate");
     this.periods = ArgChecker.notNull(periods, "rows");
-  }
-
-  /**
-   * Creates a new schedule for a list of periods.
-   *
-   * @param periods
-   * @param startDate
-   * @return  a schedule for the periods
-   */
-  public static Schedule of(LocalDate startDate, List<LocalDateRange> periods) {
-    ArgChecker.notEmpty(periods, "periods");
-    List<SchedulePeriod> rows = periods.stream()
-                                       .sorted(Comparator.comparing(LocalDateRange::getStart))
-                                       .map(SchedulePeriod::new)
-                                       .collect(toImmutableList());
-    return new Schedule(startDate, rows);
   }
 
   public SchedulePeriod period(int periodNum) {
@@ -185,7 +167,7 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
 
   //-----------------------------------------------------------------------
   /**
-   * Gets the rows.
+   * Gets the periods.
    * @return the value of the property, not null
    */
   public List<SchedulePeriod> getPeriods() {
@@ -237,7 +219,7 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
 
   protected void toString(StringBuilder buf) {
     buf.append("startDate").append('=').append(JodaBeanUtils.toString(getStartDate())).append(',').append(' ');
-    buf.append("rows").append('=').append(JodaBeanUtils.toString(getPeriods())).append(',').append(' ');
+    buf.append("periods").append('=').append(JodaBeanUtils.toString(getPeriods())).append(',').append(' ');
   }
 
   //-----------------------------------------------------------------------
@@ -256,18 +238,18 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
     private final MetaProperty<LocalDate> startDate = DirectMetaProperty.ofImmutable(
         this, "startDate", Schedule.class, LocalDate.class);
     /**
-     * The meta-property for the {@code rows} property.
+     * The meta-property for the {@code periods} property.
      */
     @SuppressWarnings({"unchecked", "rawtypes" })
-    private final MetaProperty<List<SchedulePeriod>> rows = DirectMetaProperty.ofImmutable(
-        this, "rows", Schedule.class, (Class) List.class);
+    private final MetaProperty<List<SchedulePeriod>> periods = DirectMetaProperty.ofImmutable(
+        this, "periods", Schedule.class, (Class) List.class);
     /**
      * The meta-properties.
      */
     private final Map<String, MetaProperty<?>> metaPropertyMap$ = new DirectMetaPropertyMap(
         this, null,
         "startDate",
-        "rows");
+        "periods");
 
     /**
      * Restricted constructor.
@@ -280,8 +262,8 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
       switch (propertyName.hashCode()) {
         case -2129778896:  // startDate
           return startDate;
-        case 3506649:  // rows
-          return rows;
+        case -678739246:  // periods
+          return periods;
       }
       return super.metaPropertyGet(propertyName);
     }
@@ -311,11 +293,11 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
     }
 
     /**
-     * The meta-property for the {@code rows} property.
+     * The meta-property for the {@code periods} property.
      * @return the meta-property, not null
      */
-    public final MetaProperty<List<SchedulePeriod>> rows() {
-      return rows;
+    public final MetaProperty<List<SchedulePeriod>> periods() {
+      return periods;
     }
 
     //-----------------------------------------------------------------------
@@ -324,7 +306,7 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
       switch (propertyName.hashCode()) {
         case -2129778896:  // startDate
           return ((Schedule) bean).getStartDate();
-        case 3506649:  // rows
+        case -678739246:  // periods
           return ((Schedule) bean).getPeriods();
       }
       return super.propertyGet(bean, propertyName, quiet);
@@ -348,7 +330,7 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
   public static class Builder extends DirectFieldsBeanBuilder<Schedule> {
 
     private LocalDate startDate;
-    private List<SchedulePeriod> rows = new ArrayList<SchedulePeriod>();
+    private List<SchedulePeriod> periods = new ArrayList<SchedulePeriod>();
 
     /**
      * Restricted constructor.
@@ -362,7 +344,7 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
      */
     protected Builder(Schedule beanToCopy) {
       this.startDate = beanToCopy.getStartDate();
-      this.rows = new ArrayList<SchedulePeriod>(beanToCopy.getPeriods());
+      this.periods = new ArrayList<SchedulePeriod>(beanToCopy.getPeriods());
     }
 
     //-----------------------------------------------------------------------
@@ -371,8 +353,8 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
       switch (propertyName.hashCode()) {
         case -2129778896:  // startDate
           return startDate;
-        case 3506649:  // rows
-          return rows;
+        case -678739246:  // periods
+          return periods;
         default:
           throw new NoSuchElementException("Unknown property: " + propertyName);
       }
@@ -385,8 +367,8 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
         case -2129778896:  // startDate
           this.startDate = (LocalDate) newValue;
           break;
-        case 3506649:  // rows
-          this.rows = (List<SchedulePeriod>) newValue;
+        case -678739246:  // periods
+          this.periods = (List<SchedulePeriod>) newValue;
           break;
         default:
           throw new NoSuchElementException("Unknown property: " + propertyName);
@@ -422,7 +404,7 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
     public Schedule build() {
       return new Schedule(
           startDate,
-          rows);
+          periods);
     }
 
     //-----------------------------------------------------------------------
@@ -438,13 +420,13 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
     }
 
     /**
-     * Sets the {@code rows} property in the builder.
-     * @param rows  the new value, not null
+     * Sets the {@code periods} property in the builder.
+     * @param periods  the new value, not null
      * @return this, for chaining, not null
      */
-    public Builder rows(List<SchedulePeriod> rows) {
-      JodaBeanUtils.notNull(rows, "rows");
-      this.rows = rows;
+    public Builder periods(List<SchedulePeriod> periods) {
+      JodaBeanUtils.notNull(periods, "periods");
+      this.periods = periods;
       return this;
     }
 
@@ -464,7 +446,7 @@ public class Schedule implements Iterable<SchedulePeriod>, ImmutableBean {
 
     protected void toString(StringBuilder buf) {
       buf.append("startDate").append('=').append(JodaBeanUtils.toString(startDate)).append(',').append(' ');
-      buf.append("rows").append('=').append(JodaBeanUtils.toString(rows)).append(',').append(' ');
+      buf.append("periods").append('=').append(JodaBeanUtils.toString(periods)).append(',').append(' ');
     }
 
   }

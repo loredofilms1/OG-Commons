@@ -12,6 +12,8 @@ public interface ScheduleGenerator {
 
   /**
    * Generates a new schedule from an existing schedule.
+   * TODO should this return Optional if the generator can't be applied to the schedule?
+   * or should there be another method like canApplyTo()?
    *
    * @param schedule  a schedule
    * @return  a new schedule derived from the existing schedule

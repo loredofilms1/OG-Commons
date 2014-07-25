@@ -42,17 +42,24 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
   @PropertyDefinition(validate = "notNull")
   private final List<ScheduleGenerator> generators;
 
+  @PropertyDefinition(validate = "notNull")
+  private final FieldMap fieldMap;
+
+  // TODO should this include a Map<FieldKey, Object> of default data from the trade? pass it to the generated periods
   @ImmutableConstructor
-  public GeneratedScheduleProvider(UnadjustedScheduleDefinition unadjustedSchedule, List<ScheduleGenerator> generators) {
+  public GeneratedScheduleProvider(UnadjustedScheduleDefinition unadjustedSchedule,
+                                   List<ScheduleGenerator> generators,
+                                   FieldMap fieldMap) {
+    this.fieldMap = ArgChecker.notNull(fieldMap, "fieldMap");
     this.unadjustedSchedule = ArgChecker.notNull(unadjustedSchedule, "unadjustedSchedule");
     this.generators = ArgChecker.notNull(generators, "generators");
   }
 
   @Override
   public Schedule getSchedule() {
-    Schedule empty = Schedule.of(unadjustedSchedule.getStartDate(), unadjustedSchedule.calculatePeriods());
-    // this smells a bit, the combiner function always returns null because it's never used. this is fine because
-    // stream is sequential
+    Schedule empty = new Schedule(unadjustedSchedule.getStartDate(), unadjustedSchedule.calculatePeriods(fieldMap));
+    // this smells a bit, the combiner function always returns null because it's never used.
+    // this works because stream is sequential
     return generators.stream().reduce(empty, (schedule, generator) -> generator.generate(schedule), (sch1, sch2) -> null);
   }
 
@@ -113,6 +120,15 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
 
   //-----------------------------------------------------------------------
   /**
+   * Gets the fieldMap.
+   * @return the value of the property, not null
+   */
+  public FieldMap getFieldMap() {
+    return fieldMap;
+  }
+
+  //-----------------------------------------------------------------------
+  /**
    * Returns a builder that allows this bean to be mutated.
    * @return the mutable builder, not null
    */
@@ -128,7 +144,8 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
     if (obj != null && obj.getClass() == this.getClass()) {
       GeneratedScheduleProvider other = (GeneratedScheduleProvider) obj;
       return JodaBeanUtils.equal(getUnadjustedSchedule(), other.getUnadjustedSchedule()) &&
-          JodaBeanUtils.equal(getGenerators(), other.getGenerators());
+          JodaBeanUtils.equal(getGenerators(), other.getGenerators()) &&
+          JodaBeanUtils.equal(getFieldMap(), other.getFieldMap());
     }
     return false;
   }
@@ -138,12 +155,13 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
     int hash = getClass().hashCode();
     hash += hash * 31 + JodaBeanUtils.hashCode(getUnadjustedSchedule());
     hash += hash * 31 + JodaBeanUtils.hashCode(getGenerators());
+    hash += hash * 31 + JodaBeanUtils.hashCode(getFieldMap());
     return hash;
   }
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder(96);
+    StringBuilder buf = new StringBuilder(128);
     buf.append("GeneratedScheduleProvider{");
     int len = buf.length();
     toString(buf);
@@ -157,6 +175,7 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
   protected void toString(StringBuilder buf) {
     buf.append("unadjustedSchedule").append('=').append(JodaBeanUtils.toString(getUnadjustedSchedule())).append(',').append(' ');
     buf.append("generators").append('=').append(JodaBeanUtils.toString(getGenerators())).append(',').append(' ');
+    buf.append("fieldMap").append('=').append(JodaBeanUtils.toString(getFieldMap())).append(',').append(' ');
   }
 
   //-----------------------------------------------------------------------
@@ -181,12 +200,18 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
     private final MetaProperty<List<ScheduleGenerator>> generators = DirectMetaProperty.ofImmutable(
         this, "generators", GeneratedScheduleProvider.class, (Class) List.class);
     /**
+     * The meta-property for the {@code fieldMap} property.
+     */
+    private final MetaProperty<FieldMap> fieldMap = DirectMetaProperty.ofImmutable(
+        this, "fieldMap", GeneratedScheduleProvider.class, FieldMap.class);
+    /**
      * The meta-properties.
      */
     private final Map<String, MetaProperty<?>> metaPropertyMap$ = new DirectMetaPropertyMap(
         this, null,
         "unadjustedSchedule",
-        "generators");
+        "generators",
+        "fieldMap");
 
     /**
      * Restricted constructor.
@@ -201,6 +226,8 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
           return unadjustedSchedule;
         case 305709056:  // generators
           return generators;
+        case -929025534:  // fieldMap
+          return fieldMap;
       }
       return super.metaPropertyGet(propertyName);
     }
@@ -237,6 +264,14 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
       return generators;
     }
 
+    /**
+     * The meta-property for the {@code fieldMap} property.
+     * @return the meta-property, not null
+     */
+    public final MetaProperty<FieldMap> fieldMap() {
+      return fieldMap;
+    }
+
     //-----------------------------------------------------------------------
     @Override
     protected Object propertyGet(Bean bean, String propertyName, boolean quiet) {
@@ -245,6 +280,8 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
           return ((GeneratedScheduleProvider) bean).getUnadjustedSchedule();
         case 305709056:  // generators
           return ((GeneratedScheduleProvider) bean).getGenerators();
+        case -929025534:  // fieldMap
+          return ((GeneratedScheduleProvider) bean).getFieldMap();
       }
       return super.propertyGet(bean, propertyName, quiet);
     }
@@ -268,6 +305,7 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
 
     private UnadjustedScheduleDefinition unadjustedSchedule;
     private List<ScheduleGenerator> generators = new ArrayList<ScheduleGenerator>();
+    private FieldMap fieldMap;
 
     /**
      * Restricted constructor.
@@ -282,6 +320,7 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
     protected Builder(GeneratedScheduleProvider beanToCopy) {
       this.unadjustedSchedule = beanToCopy.getUnadjustedSchedule();
       this.generators = new ArrayList<ScheduleGenerator>(beanToCopy.getGenerators());
+      this.fieldMap = beanToCopy.getFieldMap();
     }
 
     //-----------------------------------------------------------------------
@@ -292,6 +331,8 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
           return unadjustedSchedule;
         case 305709056:  // generators
           return generators;
+        case -929025534:  // fieldMap
+          return fieldMap;
         default:
           throw new NoSuchElementException("Unknown property: " + propertyName);
       }
@@ -306,6 +347,9 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
           break;
         case 305709056:  // generators
           this.generators = (List<ScheduleGenerator>) newValue;
+          break;
+        case -929025534:  // fieldMap
+          this.fieldMap = (FieldMap) newValue;
           break;
         default:
           throw new NoSuchElementException("Unknown property: " + propertyName);
@@ -341,7 +385,8 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
     public GeneratedScheduleProvider build() {
       return new GeneratedScheduleProvider(
           unadjustedSchedule,
-          generators);
+          generators,
+          fieldMap);
     }
 
     //-----------------------------------------------------------------------
@@ -367,10 +412,21 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
       return this;
     }
 
+    /**
+     * Sets the {@code fieldMap} property in the builder.
+     * @param fieldMap  the new value, not null
+     * @return this, for chaining, not null
+     */
+    public Builder fieldMap(FieldMap fieldMap) {
+      JodaBeanUtils.notNull(fieldMap, "fieldMap");
+      this.fieldMap = fieldMap;
+      return this;
+    }
+
     //-----------------------------------------------------------------------
     @Override
     public String toString() {
-      StringBuilder buf = new StringBuilder(96);
+      StringBuilder buf = new StringBuilder(128);
       buf.append("GeneratedScheduleProvider.Builder{");
       int len = buf.length();
       toString(buf);
@@ -384,6 +440,7 @@ public class GeneratedScheduleProvider implements ScheduleProvider, ImmutableBea
     protected void toString(StringBuilder buf) {
       buf.append("unadjustedSchedule").append('=').append(JodaBeanUtils.toString(unadjustedSchedule)).append(',').append(' ');
       buf.append("generators").append('=').append(JodaBeanUtils.toString(generators)).append(',').append(' ');
+      buf.append("fieldMap").append('=').append(JodaBeanUtils.toString(fieldMap)).append(',').append(' ');
     }
 
   }
