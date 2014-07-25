@@ -37,23 +37,23 @@ public class GeneratedScheduleProviderTest {
     AdjustedScheduleDefinition paymentSchedule =
         new AdjustedScheduleDefinition(() -> calendar, businessDayConvention, paymentOffset, false);
 
-    AccrualDatesGenerator accrualDatesGenerator = new AccrualDatesGenerator();
-    PaymentDatesGenerator paymentDatesGenerator = new PaymentDatesGenerator();
-    CouponGenerator couponGenerator = new CouponGenerator();
+    // TODO choose the generators based on the schedules and other data in the model
+    // how do I know which generators are required for a full set and how they depend on each other?
+    // do they come as a predefined set? where does the logic live to choose a set?
+    // or is there a set of types - accrual dates, payment dates, coupons etc?
+    // and generators are categorised and the categories are tried in turn
+    ImmutableList<ScheduleGenerator> generators = ImmutableList.of(new AccrualDatesGenerator(),
+                                                                   new PaymentDatesGenerator(),
+                                                                   new CouponGenerator());
 
-    // TODO choose the generators based on the schedules and any other data in the model
-
-    ImmutableList<ScheduleGenerator> generators = ImmutableList.of(accrualDatesGenerator,
-                                                                   paymentDatesGenerator,
-                                                                   couponGenerator);
-    FieldMap tradeFields = new FieldMapBuilder().add(Fields.ACCRUAL_SCHEDULE, accrualScheduleDefinition)
-                                                .add(Fields.PAYMENT_SCHEDULE, paymentSchedule)
-                                                .add(Fields.CURRENCY, Currency.USD)
-                                                .add(Fields.NOTIONAL, 100_000_000d)
-                                                .add(Fields.RATE, 0.015)
-                                                .add(Fields.PAYER, true)
-                                                .add(Fields.DAY_COUNT, DayCount.DC_30U_360)
-                                                .build();
+    FieldMap tradeFields = new FieldBuilder().add(Fields.ACCRUAL_SCHEDULE, accrualScheduleDefinition)
+                                             .add(Fields.PAYMENT_SCHEDULE, paymentSchedule)
+                                             .add(Fields.CURRENCY, Currency.USD)
+                                             .add(Fields.NOTIONAL, 100_000_000d)
+                                             .add(Fields.RATE, 0.015)
+                                             .add(Fields.PAYER, true)
+                                             .add(Fields.DAY_COUNT, DayCount.DC_30U_360)
+                                             .build();
 
     GeneratedScheduleProvider scheduleProvider =
         new GeneratedScheduleProvider(unadjustedScheduleDefinition, generators, tradeFields);

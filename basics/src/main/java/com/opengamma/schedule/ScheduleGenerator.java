@@ -7,6 +7,8 @@ package com.opengamma.schedule;
 
 /**
  * Interface for classes that can derive a schedule from an existing schedule.
+ * TODO would it help to have a method returning the FieldKeys required?
+ * or is that too blunt an instrument anyway as the values or combinations of values might be important
  */
 public interface ScheduleGenerator {
 

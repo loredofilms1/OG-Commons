@@ -11,11 +11,11 @@ import java.util.Map;
 /**
  *
  */
-public class FieldMapBuilder {
+public class FieldBuilder {
 
   private final Map<FieldKey<?>, Object> map = new HashMap<>();
 
-  public <T> FieldMapBuilder add(FieldKey<T> key, T value) {
+  public <T> FieldBuilder add(FieldKey<T> key, T value) {
     map.put(key, value);
     return this;
   }

@@ -18,7 +18,6 @@ public class CouponGenerator implements ScheduleGenerator {
 
   @Override
   public Schedule generate(Schedule schedule) {
-
     return schedule.map(period -> {
       Boolean payer = period.get(Fields.PAYER);
       LocalDate accrualStart = period.get(Fields.ACCRUAL_START_DATE);

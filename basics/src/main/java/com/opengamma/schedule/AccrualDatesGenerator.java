@@ -23,6 +23,7 @@ public class AccrualDatesGenerator implements ScheduleGenerator {
       BusinessDayConvention businessDayConvention = scheduleDefinition.getBusinessDayConvention();
       BusinessDayCalendar calendar = scheduleDefinition.getCalendar().get();
       LocalDateRange periodDateRange = period.getDateRange();
+
       LocalDate accrualStartDate = businessDayConvention.adjust(periodDateRange.getStart(), calendar);
       LocalDate accrualEndDate = businessDayConvention.adjust(periodDateRange.getEndInclusive(), calendar);
       return period.withValues(Fields.ACCRUAL_START_DATE, accrualStartDate,
