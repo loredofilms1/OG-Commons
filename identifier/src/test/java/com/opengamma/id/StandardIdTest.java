@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Copyright (C) 2014 - present by OpenGamma Inc. and the OpenGamma group of companies
  *
  * Please see distribution for license.
  */
@@ -153,6 +153,11 @@ public class StandardIdTest {
     StandardId d1b = StandardId.of(SCHEME, "d1");
 
     assertEquals(d1a.hashCode(), d1b.hashCode());
+  }
+
+  public void test_getIdentityKey() {
+    StandardId test = StandardId.of(SCHEME, "value");
+    assertEquals(test, test.getStandardId());
   }
 
 }

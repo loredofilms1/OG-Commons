@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 - present by OpenGamma Inc. and the OpenGamma group of companies
+ * Copyright (C) 2014 - present by OpenGamma Inc. and the OpenGamma group of companies
  *
  * Please see distribution for license.
  */
@@ -41,7 +41,7 @@ import com.google.common.collect.ComparisonChain;
  * <p>
  * This class is immutable and thread-safe.
  */
-public final class StandardId implements Comparable<StandardId>, Serializable {
+public final class StandardId implements StandardIdentifiable, Comparable<StandardId>, Serializable {
 
   /** Serialization version. */
   private static final long serialVersionUID = 1L;
@@ -110,6 +110,11 @@ public final class StandardId implements Comparable<StandardId>, Serializable {
   private StandardId(String scheme, String value) {
     this.scheme = ArgChecker.matches(REGEX_SCHEME, scheme, "scheme");
     this.value = ArgChecker.matches(REGEX_VALUE, value, "value");
+  }
+
+  @Override
+  public StandardId getStandardId() {
+    return this;
   }
 
   //-------------------------------------------------------------------------
